@@ -1,0 +1,677 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>JSLess: A Tale of a Fileless Javascript Memory-Resident Malware</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-interactiveBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-translucentGray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="2a544b22-51db-4d2c-88f2-4f7142229a92" class="page sans"><header><div class="page-header-icon undefined"><span class="icon">🔬</span></div><h1 class="page-title"><strong>JSLess: A Tale of a Fileless Javascript Memory-Resident Malware</strong></h1><p class="page-description"></p></header><div class="page-body"><ol type="1" id="691d722c-d5eb-4a22-9828-12ab5040527c" class="numbered-list" start="1"><li><strong>WebSockets</strong><ul id="cb1aac8d-9c46-4dbf-837b-9ee537657ee0" class="bulleted-list"><li style="list-style-type:disc"><strong>Advantages</strong>:<ul id="48c9f90a-a1ec-466a-a4a8-fc7060ad7bed" class="bulleted-list"><li style="list-style-type:circle">Provides bi-directional real-time communication.</li></ul><ul id="0abcd002-dabe-4001-82f2-cfb03bb5787f" class="bulleted-list"><li style="list-style-type:circle">Enables the development of instant messaging apps, gaming applications, streaming services, and more.</li></ul><ul id="a90fff54-a5d9-48ec-941a-21fdf43379b3" class="bulleted-list"><li style="list-style-type:circle">Supported by all major web browsers and common programming languages.</li></ul></li></ul><ul id="c1d0ade4-4f18-4e44-a081-1119f9714790" class="bulleted-list"><li style="list-style-type:disc"><strong>Security concerns</strong>:<ul id="75533f46-0036-4309-8244-efd1fbcac1ca" class="bulleted-list"><li style="list-style-type:circle">Opens a new attack vector for malicious actors.</li></ul><ul id="dee23035-313b-4a3f-94cf-348411fe0623" class="bulleted-list"><li style="list-style-type:circle">Does not obey the same-origin policy, making cross-site scripting (XSS) and man in the middle (MitM) attacks possible.</li></ul><ul id="d5d95d5a-e59e-4164-92b5-bf39e6dda533" class="bulleted-list"><li style="list-style-type:circle">Not bound by cross-origin resource sharing (CORS), allowing for requests to resources from different origins.</li></ul></li></ul></li></ol><ol type="1" id="98f2043c-1b16-418a-93cb-951b9ac18edf" class="numbered-list" start="2"><li><strong>WebWorkers</strong><ul id="6dad5d03-4a14-4cce-8d4b-32b78fb13279" class="bulleted-list"><li style="list-style-type:disc"><strong>Advantages</strong>:<ul id="61333e4c-b144-4af9-87d3-5907f08b27b7" class="bulleted-list"><li style="list-style-type:circle">Enables JavaScript code to run in a background thread.</li></ul><ul id="968fed76-e22a-414c-b512-6afe0b1ad1de" class="bulleted-list"><li style="list-style-type:circle">Prevents long tasks from blocking the main UI thread, providing a more responsive web application.</li></ul><ul id="ee4d98a6-e2d5-4160-91c1-c51c59fd9118" class="bulleted-list"><li style="list-style-type:circle">Supported by all major web browsers.</li></ul></li></ul><ul id="44edca80-e695-459a-92f1-a52d641c4c8c" class="bulleted-list"><li style="list-style-type:disc"><strong>Security concerns</strong>:<ul id="fadde85c-ef03-4567-9556-1e1326a5b66b" class="bulleted-list"><li style="list-style-type:circle">Allows DOM-based cross-site scripting (XSS).</li></ul><ul id="ed25f272-626a-4471-acc7-67d0328f9e81" class="bulleted-list"><li style="list-style-type:circle">CORS does not bind it, enabling sharing and accessing resources from different origins.</li></ul><ul id="eef3b91e-8ba5-4dea-af46-0cf61505bae6" class="bulleted-list"><li style="list-style-type:circle">Enables silent running JavaScript code, which can be exploited for malicious activities like cryptocurrency mining.</li></ul></li></ul></li></ol><ol type="1" id="96bc2e05-ba00-4f03-9a1a-cb9394d01382" class="numbered-list" start="3"><li><strong>Service Workers</strong><ul id="b557930b-b1e8-4946-a6eb-cde606b8a710" class="bulleted-list"><li style="list-style-type:disc"><strong>Advantages</strong>:<ul id="a0e38112-3c3b-4345-8130-2cb5f9583ded" class="bulleted-list"><li style="list-style-type:circle">Allows running JavaScript code in a separate background thread, independent of a specific webpage or the web browser.</li></ul><ul id="82d254cf-901c-4345-a609-e41425969068" class="bulleted-list"><li style="list-style-type:circle">Enhances the offline experience and performance of web apps.</li></ul></li></ul><ul id="f1e2ddfc-d2cc-434c-9318-6c2482a2a4bf" class="bulleted-list"><li style="list-style-type:disc"><strong>Security concerns</strong>:<ul id="78708746-2fd0-4b89-97c2-e801b3e317f9" class="bulleted-list"><li style="list-style-type:circle">Shares the same risks as WebWorkers.</li></ul><ul id="6653afa1-66f6-46a0-9d2f-7789b56e512c" class="bulleted-list"><li style="list-style-type:circle">The lifetime of the security risks are persistent, given the longer lifespan of Service Workers in the background.</li></ul><hr id="8d39f82b-7746-468e-a8a2-d3fd3ee60bd0"/><p id="0e753f0d-4c0b-48aa-8f40-ad172ac82b22" class=""><strong>Key Points</strong>:</p><ol type="1" id="8a51a402-ca48-4d46-bcee-22527f23a0d9" class="numbered-list" start="1"><li><strong>Benign JavaScript Features with Malicious Potentials</strong>:<ul id="f0dc6199-19ca-4dfa-86ea-8ef09eb5c4c5" class="bulleted-list"><li style="list-style-type:disc">The introduction of HTML5 paved the way for powerful APIs and features to be used by JavaScript, enabling richer and more interactive web applications.</li></ul><ul id="9d2fc988-d54d-4e2a-9f20-62725dc62a9e" class="bulleted-list"><li style="list-style-type:disc">Three benign features discussed with malicious potentials:<ul id="d813c433-600b-4aee-a191-3ca532080cf5" class="bulleted-list"><li style="list-style-type:circle"><strong>WebSockets</strong>: Enables two-way communication between client and server, but poses a risk as it doesn&#x27;t obey the same-origin policy, allowing for potential misuse like XSS attacks.</li></ul><ul id="af701c51-3b15-494f-bf22-bd26b81978b0" class="bulleted-list"><li style="list-style-type:circle"><strong>WebWorkers</strong>: Allows JavaScript to run in a background thread separate from the main UI thread, but can be exploited for running silent malicious scripts in the background, e.g., crypto-mining without user consent.</li></ul><ul id="ef2de167-fce1-48a7-bab0-7bdf5c413d16" class="bulleted-list"><li style="list-style-type:circle"><strong>Service Workers</strong>: Like WebWorkers, but with a more extended lifetime. It can continue to run even if the user navigates away from the app or closes the browser, allowing for persistent threats.</li></ul></li></ul></li></ol><ol type="1" id="5caf0e94-6491-4d65-a09a-1e338f797ce2" class="numbered-list" start="2"><li><strong>JavaScript Fileless Malware</strong>:<ul id="ca31dfd6-8333-4323-98fd-cd02b2101e9d" class="bulleted-list"><li style="list-style-type:disc"><strong>JSLess</strong>: A proof-of-concept fileless malware which takes advantage of the aforementioned benign features to implement a fileless malware attack.</li></ul><ul id="efa55a65-c2f4-439c-8fdc-34ff39668082" class="bulleted-list"><li style="list-style-type:disc"><strong>Infection Scenarios</strong>: Two main scenarios identified — (1) The victim visiting a malicious server, and (2) A legitimate server getting compromised.</li></ul><ul id="fac70d40-679a-4b7b-b234-58c5f78d79e1" class="bulleted-list"><li style="list-style-type:disc"><strong>Operational Scenario</strong>:<ul id="53163cfe-2fe0-4924-8a9e-ca518846e58b" class="bulleted-list"><li style="list-style-type:circle">The malware is delivered via a WebSocket connection and injected into the victim&#x27;s browser.</li></ul><ul id="23f0bbb0-3d0a-4a39-95c0-d4b6d2436cb1" class="bulleted-list"><li style="list-style-type:circle">The WebSocket API is used to download the malware code dynamically, which provides an evasive behavior against detection.</li></ul><ul id="7fdfe35c-8199-40eb-b3c2-c9113aca996e" class="bulleted-list"><li style="list-style-type:circle">JSLess utilizes WebWorkers for running computationally intensive malicious activities.</li></ul><ul id="1b2bdecb-c8a7-484e-a8f9-962c4e4d64f0" class="bulleted-list"><li style="list-style-type:circle">ServiceWorkers API is used to achieve malware persistence, allowing it to remain operational even after navigating away from the webpage or closing the browser.</li></ul><ul id="1b6cde39-a45f-46af-96d6-4e84770b39d0" class="bulleted-list"><li style="list-style-type:circle">An example provided is a malicious MapReduce system, where the malware spreads computational tasks across infected machines.</li></ul></li></ul></li></ol><ol type="1" id="0b1f4a16-94d9-4715-8333-c0b58e90851f" class="numbered-list" start="3"><li><strong>Attack Vectors</strong>:<ul id="2605af72-371d-4643-a8d3-cdcc3b3ae35a" class="bulleted-list"><li style="list-style-type:disc"><strong>Data Stealing</strong>: Capture keystrokes, cookie and web storage data, access multimedia devices.</li></ul><ul id="6bf25870-69f8-46b7-a582-66e15fa5b953" class="bulleted-list"><li style="list-style-type:disc"><strong>DDoS</strong>: Construct a botnet of infected browsers to target specific websites or servers.</li></ul><ul id="405e37bc-3b29-456c-ac29-7a89b8ecd57c" class="bulleted-list"><li style="list-style-type:disc"><strong>Resource Consumption Attack</strong>: Using the victim&#x27;s browser for tasks like cryptocurrency mining or password cracking.</li></ul><ul id="27cdd6fd-4b43-44b4-b803-db3139cd96d4" class="bulleted-list"><li style="list-style-type:disc">Other possible attacks include Click Fraud and RAT-in-the-Browser (RitB) Attacks.</li></ul><hr id="9c96b7c6-f9cd-4a35-9d71-137e4f9c7759"/><h1 id="6ba163e5-7f56-4c3a-9b98-3b521d61a12e" class="">5. Experiment &amp; Evaluation</h1><p id="37083ed9-138a-471d-af04-2012b2d50c0e" class="">In this section, the researchers detail the methodology and results of their experiment using a proof-of-concept fileless malware named JSless. This malware utilizes vulnerabilities in JavaScript/HTML5 to execute its malicious operations.</p><p id="8c7b67b7-40de-4730-bb57-13b9dfb3b3a3" class=""><strong>Key Points:</strong></p><ol type="1" id="f4a069a0-f539-42dd-a248-1d264b9a2b5c" class="numbered-list" start="1"><li><strong>Setup</strong>: The researchers developed a web app (a shared chat board) designed to be compromised by the JSless malware. Both the malicious JSless command-and-control (C&amp;C) server and the target web app were developed using the MEAN stack. These applications were deployed on separate AWS instances to simulate a real-world environment. The source code of both is available for further study on GitHub/bitbucket.</li></ol><ol type="1" id="790ad8d1-f369-40e6-84b6-70ec0e4bd1c7" class="numbered-list" start="2"><li><strong>Testing</strong>: The researchers primarily tested two malicious operations of JSless:<ul id="ba771c54-dab9-4be6-a921-a868503ea1cd" class="bulleted-list"><li style="list-style-type:disc">Data stealing attack</li></ul><ul id="3aaac4a7-a1ec-48fe-94ef-8422e3a2ab78" class="bulleted-list"><li style="list-style-type:disc">Resource consumption attack</li></ul></li></ol><ol type="1" id="64a4dc19-6a98-473d-ade8-0c7819ff3dbf" class="numbered-list" start="3"><li><strong>Detection</strong>: The study identified seven anti-malware tools capable of detecting JavaScript malware. Notably, none of these tools could detect the malicious operations of JSless.</li></ol><ol type="1" id="69fcb607-d508-46ec-b3a6-7b6b75457e60" class="numbered-list" start="4"><li><strong>Analysis</strong>: There are several reasons the malware went undetected:<ul id="2564ba34-569e-486f-b2c1-29d2a9c11263" class="bulleted-list"><li style="list-style-type:disc"><strong>WebSocket Use</strong>: JSless&#x27;s use of WebSocket to deliver and execute obfuscated malicious code hampers static analysis tools, as the malicious code is only injected dynamically and does not pre-exist on the compromised server.</li></ul><ul id="5c3fe609-d2a6-4255-b96d-ed035cd5b804" class="bulleted-list"><li style="list-style-type:disc"><strong>Benign APIs</strong>: The malware relies on benign JavaScript/HTML5 APIs to function. Since these are legitimate features, they don’t raise any flags, making dynamic analysis difficult.</li></ul><ul id="a6417497-6f6b-4c9e-898e-0ecde30c8af8" class="bulleted-list"><li style="list-style-type:disc"><strong>Fileless Nature</strong>: The malware does not write to the victim&#x27;s file system, hence escaping traditional detection methods that search for suspicious files.</li></ul></li></ol><ol type="1" id="3a3c88af-7d64-40ed-9851-b069ffb3ff6e" class="numbered-list" start="5"><li><strong>Mitigation Recommendations</strong>: The paper suggests that static analysis and blocking new JavaScript/HTML5 APIs are not the solution to mitigate threats like JSless. Instead, the researchers believe the future lies in continuous, context-aware dynamic analysis to detect and potentially mitigate the impact of fileless malware.</li></ol><p id="399638f0-2507-4197-8b84-869c54b434d3" class=""><strong>Commentary</strong>:</p><p id="ce9d5c68-199f-4d57-aa7b-04338d06bd3f" class="">The rise of fileless malware like JSless represents a significant challenge in cybersecurity. Unlike traditional malware, which relies on a physical file to be present on the victim&#x27;s system, fileless malware operates entirely in memory, leaving no trace on the victim’s file system. This makes them incredibly stealthy and difficult to detect.</p><p id="ac1d2090-44a2-45b7-b5cb-8b9a18314e0c" class="">This research is essential as it exposes vulnerabilities within popular web technologies, highlighting the need for more advanced detection methods and security measures. While the paper suggests continuous, context-aware dynamic analysis as a potential solution, this might not be the only approach. Future research might delve into machine learning and AI-driven methods to detect anomalies in network traffic and system behaviors. Additionally, web developers and platform creators need to be aware of these vulnerabilities and should continuously work on refining and updating their technologies to reduce potential exploit avenues.</p><h2 id="9bef658e-01fc-4e96-8b6e-dfa51b18b053" class="">5.3 Tools Analysis Result</h2><p id="fbdeac57-03d0-4d34-b5a6-b38ab61e4731" class="">The section provides a deep analysis of several web-based security scanning tools and their efficacy in detecting JSless, a JavaScript fileless malware. Each tool utilizes a combination of static and dynamic techniques, database searches, and heuristic methods to identify malicious activities on a website. Despite the robust features and mechanisms employed by these tools, JSless was able to evade detection by all of them.</p><p id="891d352f-81d0-49d8-83b7-c548f69973a1" class=""><strong>Key Points and Observations:</strong></p><ol type="1" id="c90c1d33-2b8a-4789-b452-3c151d01f74f" class="numbered-list" start="1"><li><strong>ReScan.Pro</strong>: This tool offers:<ul id="4265144a-6f0d-4fa4-a1d8-4333908addde" class="bulleted-list"><li style="list-style-type:disc">Static Page Scanning using signature detection.</li></ul><ul id="78544418-6cfe-44be-b1d9-203f197b2fc0" class="bulleted-list"><li style="list-style-type:disc">Behavioral Analysis to imitate website user actions.</li></ul><ul id="e86bca5d-57ff-411a-b688-4bba53e9ae43" class="bulleted-list"><li style="list-style-type:disc">Dynamic Page Analysis to decode encoded JavaScript.</li></ul><p id="b0e2166d-73f4-4d93-bc60-603343bcf98a" class=""><strong>Result</strong>: ReScan.Pro failed to detect the JSless malware.</p></li></ol><ol type="1" id="41853b0e-62ce-4c3c-a5e8-da42afd5ebc0" class="numbered-list" start="2"><li><strong>Web Inspector</strong>: Key features include:<ul id="17ae3961-46fb-474e-aff6-53277bc665c7" class="bulleted-list"><li style="list-style-type:disc">Honeypot Engine for Exploit Packs and multi-redirect malware detection.</li></ul><ul id="f7f95251-c454-4615-8f90-ff3ef9622d99" class="bulleted-list"><li style="list-style-type:disc">Antivirus Detection, BlackList Checking, SSL Checking, and Analyst Research.</li></ul><p id="a75373ce-e56f-40a5-96b7-dddaaebece75" class=""><strong>Result</strong>: The JSless malware successfully evaded Web Inspector’s detection mechanisms.</p></li></ol><ol type="1" id="f44b9b65-f1a2-447d-a0a3-3b11c823da52" class="numbered-list" start="3"><li><strong>Sucuri</strong>: This tool boasts:<ul id="73df2ccb-9bba-4757-83db-7c2a2dae8ae7" class="bulleted-list"><li style="list-style-type:disc">Website monitoring and online scanning.</li></ul><ul id="73a18bb7-c1c1-4a2b-8a78-fc90040e6499" class="bulleted-list"><li style="list-style-type:disc">Server-side monitoring to identify backdoors and other threats.</li></ul><ul id="3f82307d-654b-4d36-a511-44c1f2bb77f6" class="bulleted-list"><li style="list-style-type:disc">Static techniques combined with intelligent signatures and heuristic detection.</li></ul><p id="955eb108-f976-435e-aaf9-a70207b5d08d" class=""><strong>Result</strong>: Sucuri identified a medium security risk due to Insecure SSL certificates, but failed to detect the JSless malware.</p></li></ol><ol type="1" id="60b67e74-9c22-4017-9ef7-49a6c4b12412" class="numbered-list" start="4"><li><strong>Quttera</strong>: Key features:<ul id="85e05c53-7bbb-4be1-b963-5dadd8a39ff6" class="bulleted-list"><li style="list-style-type:disc">Non-signature based technology.</li></ul><ul id="32244d3f-09bd-43f9-98b3-28c7007beb80" class="bulleted-list"><li style="list-style-type:disc">Real-time detection of shell-codes, obfuscated JavaScript, and other threats.</li></ul><p id="a351eeb0-5e88-4054-9a22-0037df2ee3eb" class=""><strong>Result</strong>: The outcome of Quttera&#x27;s scan is not mentioned, but it can be inferred that it too failed to detect the malware.</p></li></ol><ol type="1" id="93b28d55-d1d9-48b9-96cb-663d5f80f12f" class="numbered-list" start="5"><li><strong>VirusTotal</strong>: Uses a variety of techniques from a large set of antivirus engines and website scanners.<p id="9b2d7fbf-4ef3-478c-976f-2ae0a80c3c5c" class=""><strong>Result</strong>: Despite scanning with 66 different detection engines, none detected the compromised web app.</p></li></ol><ol type="1" id="902c8152-c62d-4a8c-8645-e4890b30ec4d" class="numbered-list" start="6"><li><strong>AI-BOLIT</strong>: Uses heuristic analysis and AI algorithms to find malware in scripts.<p id="5cc08e35-7f95-422b-ac57-0a19073b828a" class=""><strong>Result</strong>: Not only did AI-BOLIT fail to detect JSless, it also produced false positives by flagging core NodeJS modules as malicious.</p></li></ol><p id="b61783b1-8912-4e73-8096-cb63d6acb49f" class=""><strong>Commentary</strong>:</p><p id="977a0a78-1df4-425f-bce7-15833b22a5e5" class="">The results are alarming, showcasing the stealthy nature of fileless malware like JSless. Each tested tool, despite being equipped with sophisticated malware detection algorithms, failed to detect the threat. The challenge with JSless lies in its fileless design, its usage of legitimate APIs, and its dynamic code injection through WebSockets.</p><p id="89142c17-919d-4817-8904-6f09c5dbeae7" class="">These findings emphasize the necessity for the evolution of malware detection tools. Traditional static and dynamic analysis, and signature-based detection are falling short in the face of advanced threats. The focus should shift to developing better heuristic and behavior-based detection, continuous monitoring, and perhaps leveraging AI to identify patterns that are abnormal.</p><p id="87dc795f-9b31-47d0-91b3-2d3e839c231a" class="">
+</p><figure id="b95662cc-30c1-4c0c-a41b-00f1500355f8"><a href="https://link.springer.com/chapter/10.1007/978-3-030-34339-2_7" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">JSLess: A Tale of a Fileless Javascript Memory-Resident Malware</div><div class="bookmark-description">New computing paradigms, modern feature-rich programming languages and off-the-shelf software libraries enabled the development of new sophisticated malware families. Evidence of this phenomena is the recent growth of fileless malware attacks. Fileless malware or...</div></div><div class="bookmark-href"><img src="https://link.springer.com/oscar-static/images/favicons/springerlink/app-icon-iphone@3x-f259d46347.png" class="icon bookmark-icon"/>https://link.springer.com/chapter/10.1007/978-3-030-34339-2_7</div></div><img src="https://static-content.springer.com/cover/book/978-3-030-34339-2.jpg" class="bookmark-image"/></a></figure></li></ol></li></ul></li></ol></div></article></body></html>

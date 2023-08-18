@@ -1,0 +1,676 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Technical Solution v2 - Implementation of Deep Learning in the Registry and WMI monitoring process</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-interactiveBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-translucentGray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="b77b5d0e-1281-48e7-8acc-95ba4001884e" class="page sans"><header><div class="page-header-icon undefined"><span class="icon">⚙️</span></div><h1 class="page-title">Technical Solution v2 - Implementation of Deep Learning in the Registry and WMI monitoring process</h1><p class="page-description"></p></header><div class="page-body"><h2 id="3c70bd12-543c-4a33-a79d-e0486f91294c" class=""><strong>Data Assimilation and Deep Learning:</strong></h2><p id="6d6c135d-d1b7-4b3c-b828-c33ec02c44fa" class="">The foundation of any Deep Learning model is data. However, data from sources like the Windows Registry and WMI is inherently unstructured and diverse.</p><ul id="267a6196-63a4-4b7e-b8f3-52d4ee47b4d4" class="bulleted-list"><li style="list-style-type:disc"><strong>Windows Registry</strong>: A vast hierarchical database, it stores configurations and settings for Windows. Each registry entry, be it a key or a value, can be tokenised and vectorised, transforming it into a format suitable for neural network processing.</li></ul><ul id="90443a1d-c101-4fb3-85bd-c2cdbd18732d" class="bulleted-list"><li style="list-style-type:disc"><strong>WMI</strong>: Standing for Windows Management Instrumentation, WMI is a treasure trove of management data and operations. Command sequences, scripts, and even event logs from WMI can be tokenised, sequenced, and then vectorised, preparing them for deep learning processing.</li></ul><hr id="bdb8a514-a53d-42a0-b424-09bcca86ae48"/><h2 id="9f603b10-d8dd-40a9-8c70-a2f21b63bca9" class=""><strong>Preprocessing</strong></h2><p id="a8f48a47-3242-4434-bd25-f616bbc77650" class="">Before any data interacts with a Deep Learning model, it undergoes rigorous preprocessing.</p><ul id="322f0623-aff1-48f2-bb8d-64dd4cf8539c" class="bulleted-list"><li style="list-style-type:disc"><strong>Tokenisation and Vectorisation</strong>: Transforming textual data, like command sequences or registry paths, into a numerical format. This conversion is pivotal for the subsequent neural processing.</li></ul><ul id="5068c08f-969e-4267-928c-d86c1ebabd0e" class="bulleted-list"><li style="list-style-type:disc"><strong>Sequence Padding</strong>: Given the sequential nature of command logs and scripts, it&#x27;s essential to ensure uniform sequence lengths. Padding ensures this uniformity, crucial for models like RNNs and LSTMs.</li></ul><ul id="45c86e29-eda5-441e-b903-df85350cfecc" class="bulleted-list"><li style="list-style-type:disc"><strong>Feature Scaling and Normalisation</strong>: Data from heuristic analysis, often in varied scales and units, needs to be standardised. This ensures that no particular feature disproportionately influences the learning process.</li></ul><hr id="a83c6c2e-54a1-48d4-8a53-7f6e9614c3d1"/><h2 id="b6a264b5-bba4-4390-a110-72c1b59643c9" class=""><strong>Architecting the Deep Learning Model:</strong></h2><p id="b17062f9-a170-4309-a772-2dbb7d571c13" class="">Given the nature of the data and the problem at hand, a hybrid deep learning model can be particularly effective.</p><ul id="9c172bc2-d581-40a5-86ea-e8e5f4aa8b6e" class="bulleted-list"><li style="list-style-type:disc"><strong>Convolutional Neural Networks (CNNs)</strong>: These layers excel at identifying patterns within localised data segments. When applied to tokenised data from the Windows Registry or WMI, CNNs can discern patterns or anomalies indicative of malicious activity.</li></ul><ul id="74f77d14-eb0a-43c4-8f3d-e9cd5f1828ad" class="bulleted-list"><li style="list-style-type:disc"><strong>Recurrent Neural Networks (RNNs) or Long Short-Term Memory (LSTM) Networks</strong>: Given the sequential nature of command logs and scripts, RNNs or LSTMs can remember patterns from previous sequences, making them adept at detecting anomalies over longer sequences.</li></ul><ul id="4fb0de28-c278-45a5-9df7-512b73e504b9" class="bulleted-list"><li style="list-style-type:disc"><strong>Dense or Fully Connected Layers</strong>: These layers integrate the features extracted by the CNN and RNN layers, culminating in a final output that classifies the data as benign or malicious.</li></ul><hr id="2659d636-f98b-4eb3-8ac6-b63a590f69f8"/><h2 id="819d9b51-8aee-4fcd-9c3e-a4bbc549c456" class=""><strong>Model Training, Validation and Testing:</strong></h2><p id="cda8a9af-c489-4e79-aeca-73040bcaae87" class=""><strong>Loss Function</strong>: In the realm of fileless malware detection, the primary goal is binary classification: determining if a given data point (e.g., a registry entry or a WMI command sequence) is benign or malicious. The binary cross-entropy loss function is apt for this task. It quantifies the difference between the predicted probability distribution (benign or malicious) and the actual distribution. Given the stealthy nature of fileless malware, it&#x27;s crucial to minimise this loss, ensuring that the model&#x27;s predictions align closely with the ground truth.</p><p id="2c7de993-a104-4199-9a2b-cb23df98f3ac" class=""><strong>Optimisers</strong>: The choice of optimiser can significantly influence the model&#x27;s performance. Algorithms like Adam or SGD dynamically adjust the model&#x27;s weights based on the computed loss. In the context of fileless malware detection, where data can be highly imbalanced (many more benign entries than malicious ones), optimisers play a pivotal role in ensuring that the model doesn&#x27;t become biased towards the majority class.</p><p id="011d3cb4-8460-4e7e-90a3-1170b2252df4" class=""><strong>Epochs and Batches</strong>: Given the vast and diverse nature of data from the Windows Registry and WMI, training the model requires multiple passes over the entire dataset. Each pass is termed an &#x27;epoch&#x27;. To ensure efficient learning, data is fed in smaller chunks or &#x27;batches&#x27;. This batch-wise feeding is especially crucial when dealing with large datasets, ensuring that the model can generalise well across diverse fileless malware signatures and tactics.</p><hr id="5738a1df-97fe-4161-966f-a7ee300cae58"/><h2 id="4c53f766-61c9-4456-9a0b-69e9b2515ba4" class=""><strong>Continuous Learning for Fileless Malware Detection:</strong></h2><p id="0e647279-13c3-4066-8eb9-535ca3a4a836" class=""><strong>Streaming Data Integration</strong>: Once trained, the model&#x27;s real test begins in real-world scenarios. For real-time detection of fileless malware, the model must process live data streams from the Windows Registry and WMI. Given the dynamic nature of these sources, where entries can be added, modified, or deleted frequently, the model needs to be adept at handling streaming data, ensuring that it can make predictions on-the-fly without significant latency.</p><p id="7566256a-5c04-4194-84ed-35d2ee92cc97" class=""><strong>Alert Mechanisms</strong>: The ultimate goal of the model is to safeguard systems against fileless malware threats. Upon detecting potential malicious activity, it&#x27;s not enough for the model to make an internal classification. It needs to communicate this threat to system administrators or security solutions in place. An efficient alert mechanism, which can be integrated with existing security infrastructures, ensures that threats are not just detected but also acted upon. This could involve isolating the affected system, triggering deeper scans, or even notifying human experts for further investigation.</p><p id="06ae5b5e-0477-4e31-8d04-e5519187e0c5" class=""><strong>Continuous Learning</strong>: The world of malware is not static. New techniques, tactics, and procedures (TTPs) emerge daily. For a Deep Learning model to remain effective, it cannot be a one-off solution. It needs to evolve. Continuous learning involves periodically retraining the model with fresh data, ensuring it remains abreast of the latest fileless malware TTPs. This might involve integrating newer heuristic analysis results, updated registry data, or even novel WMI command sequences. By ensuring that the model is always learning, we ensure that it remains a robust line of defence against the ever-evolving threat of fileless malware.</p><hr id="31fb1887-c799-4e84-b9a3-b0c147243d94"/><h2 id="198e019e-daf8-4872-9393-b9417107fc60" class=""><strong>Challenges, Mitigations, and Future Directions:</strong></h2><p id="32e782ad-2984-49c7-a14c-e059de8d8f28" class="">While promising, the approach isn&#x27;t devoid of challenges.</p><ul id="e379eb49-9d5e-402b-b15b-c68f819e0f5c" class="bulleted-list"><li style="list-style-type:disc"><strong>Overfitting</strong>: A model too tailored to the training data might perform poorly on unseen data. Techniques like dropout, regularisation, and data augmentation can mitigate this.</li></ul><ul id="831ae556-61b9-4928-ad0a-3ca45255b173" class="bulleted-list"><li style="list-style-type:disc"><strong>Scalability and Performance</strong>: Deep Learning models, especially complex ones, can be computationally intensive. Efficient architectures, pruning, and quantisation can ensure real-time performance without compromising accuracy.</li></ul><ul id="741267ef-eb3c-4eb1-9178-c55a8137fa7f" class="bulleted-list"><li style="list-style-type:disc"><strong>Data Privacy and Ethics</strong>: Ensuring that all data used respects user privacy and adheres to regulations is paramount.</li></ul></div></article></body></html>

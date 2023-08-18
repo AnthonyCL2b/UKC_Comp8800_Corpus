@@ -1,0 +1,679 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Kovter - Analysis</title><style>
+/* cspell:disable-file */
+/* webkit printing magic: print all background colors */
+html {
+	-webkit-print-color-adjust: exact;
+}
+* {
+	box-sizing: border-box;
+	-webkit-print-color-adjust: exact;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+@media only screen {
+	body {
+		margin: 2em auto;
+		max-width: 900px;
+		color: rgb(55, 53, 47);
+	}
+}
+
+body {
+	line-height: 1.5;
+	white-space: pre-wrap;
+}
+
+a,
+a.visited {
+	color: inherit;
+	text-decoration: underline;
+}
+
+.pdf-relative-link-path {
+	font-size: 80%;
+	color: #444;
+}
+
+h1,
+h2,
+h3 {
+	letter-spacing: -0.01em;
+	line-height: 1.2;
+	font-weight: 600;
+	margin-bottom: 0;
+}
+
+.page-title {
+	font-size: 2.5rem;
+	font-weight: 700;
+	margin-top: 0;
+	margin-bottom: 0.75em;
+}
+
+h1 {
+	font-size: 1.875rem;
+	margin-top: 1.875rem;
+}
+
+h2 {
+	font-size: 1.5rem;
+	margin-top: 1.5rem;
+}
+
+h3 {
+	font-size: 1.25rem;
+	margin-top: 1.25rem;
+}
+
+.source {
+	border: 1px solid #ddd;
+	border-radius: 3px;
+	padding: 1.5em;
+	word-break: break-all;
+}
+
+.callout {
+	border-radius: 3px;
+	padding: 1rem;
+}
+
+figure {
+	margin: 1.25em 0;
+	page-break-inside: avoid;
+}
+
+figcaption {
+	opacity: 0.5;
+	font-size: 85%;
+	margin-top: 0.5em;
+}
+
+mark {
+	background-color: transparent;
+}
+
+.indented {
+	padding-left: 1.5em;
+}
+
+hr {
+	background: transparent;
+	display: block;
+	width: 100%;
+	height: 1px;
+	visibility: visible;
+	border: none;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+}
+
+img {
+	max-width: 100%;
+}
+
+@media only print {
+	img {
+		max-height: 100vh;
+		object-fit: contain;
+	}
+}
+
+@page {
+	margin: 1in;
+}
+
+.collection-content {
+	font-size: 0.875rem;
+}
+
+.column-list {
+	display: flex;
+	justify-content: space-between;
+}
+
+.column {
+	padding: 0 1em;
+}
+
+.column:first-child {
+	padding-left: 0;
+}
+
+.column:last-child {
+	padding-right: 0;
+}
+
+.table_of_contents-item {
+	display: block;
+	font-size: 0.875rem;
+	line-height: 1.3;
+	padding: 0.125rem;
+}
+
+.table_of_contents-indent-1 {
+	margin-left: 1.5rem;
+}
+
+.table_of_contents-indent-2 {
+	margin-left: 3rem;
+}
+
+.table_of_contents-indent-3 {
+	margin-left: 4.5rem;
+}
+
+.table_of_contents-link {
+	text-decoration: none;
+	opacity: 0.7;
+	border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+}
+
+table,
+th,
+td {
+	border: 1px solid rgba(55, 53, 47, 0.09);
+	border-collapse: collapse;
+}
+
+table {
+	border-left: none;
+	border-right: none;
+}
+
+th,
+td {
+	font-weight: normal;
+	padding: 0.25em 0.5em;
+	line-height: 1.5;
+	min-height: 1.5em;
+	text-align: left;
+}
+
+th {
+	color: rgba(55, 53, 47, 0.6);
+}
+
+ol,
+ul {
+	margin: 0;
+	margin-block-start: 0.6em;
+	margin-block-end: 0.6em;
+}
+
+li > ol:first-child,
+li > ul:first-child {
+	margin-block-start: 0.6em;
+}
+
+ul > li {
+	list-style: disc;
+}
+
+ul.to-do-list {
+	padding-inline-start: 0;
+}
+
+ul.to-do-list > li {
+	list-style: none;
+}
+
+.to-do-children-checked {
+	text-decoration: line-through;
+	opacity: 0.375;
+}
+
+ul.toggle > li {
+	list-style: none;
+}
+
+ul {
+	padding-inline-start: 1.7em;
+}
+
+ul > li {
+	padding-left: 0.1em;
+}
+
+ol {
+	padding-inline-start: 1.6em;
+}
+
+ol > li {
+	padding-left: 0.2em;
+}
+
+.mono ol {
+	padding-inline-start: 2em;
+}
+
+.mono ol > li {
+	text-indent: -0.4em;
+}
+
+.toggle {
+	padding-inline-start: 0em;
+	list-style-type: none;
+}
+
+/* Indent toggle children */
+.toggle > li > details {
+	padding-left: 1.7em;
+}
+
+.toggle > li > details > summary {
+	margin-left: -1.1em;
+}
+
+.selected-value {
+	display: inline-block;
+	padding: 0 0.5em;
+	background: rgba(206, 205, 202, 0.5);
+	border-radius: 3px;
+	margin-right: 0.5em;
+	margin-top: 0.3em;
+	margin-bottom: 0.3em;
+	white-space: nowrap;
+}
+
+.collection-title {
+	display: inline-block;
+	margin-right: 1em;
+}
+
+.page-description {
+    margin-bottom: 2em;
+}
+
+.simple-table {
+	margin-top: 1em;
+	font-size: 0.875rem;
+	empty-cells: show;
+}
+.simple-table td {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table th {
+	height: 29px;
+	min-width: 120px;
+}
+
+.simple-table-header-color {
+	background: rgb(247, 246, 243);
+	color: black;
+}
+.simple-table-header {
+	font-weight: 500;
+}
+
+time {
+	opacity: 0.5;
+}
+
+.icon {
+	display: inline-block;
+	max-width: 1.2em;
+	max-height: 1.2em;
+	text-decoration: none;
+	vertical-align: text-bottom;
+	margin-right: 0.5em;
+}
+
+img.icon {
+	border-radius: 3px;
+}
+
+.user-icon {
+	width: 1.5em;
+	height: 1.5em;
+	border-radius: 100%;
+	margin-right: 0.5rem;
+}
+
+.user-icon-inner {
+	font-size: 0.8em;
+}
+
+.text-icon {
+	border: 1px solid #000;
+	text-align: center;
+}
+
+.page-cover-image {
+	display: block;
+	object-fit: cover;
+	width: 100%;
+	max-height: 30vh;
+}
+
+.page-header-icon {
+	font-size: 3rem;
+	margin-bottom: 1rem;
+}
+
+.page-header-icon-with-cover {
+	margin-top: -0.72em;
+	margin-left: 0.07em;
+}
+
+.page-header-icon img {
+	border-radius: 3px;
+}
+
+.link-to-page {
+	margin: 1em 0;
+	padding: 0;
+	border: none;
+	font-weight: 500;
+}
+
+p > .user {
+	opacity: 0.5;
+}
+
+td > .user,
+td > time {
+	white-space: nowrap;
+}
+
+input[type="checkbox"] {
+	transform: scale(1.5);
+	margin-right: 0.6em;
+	vertical-align: middle;
+}
+
+p {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.image {
+	border: none;
+	margin: 1.5em 0;
+	padding: 0;
+	border-radius: 0;
+	text-align: center;
+}
+
+.code,
+code {
+	background: rgba(135, 131, 120, 0.15);
+	border-radius: 3px;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 85%;
+	tab-size: 2;
+}
+
+code {
+	color: #eb5757;
+}
+
+.code {
+	padding: 1.5em 1em;
+}
+
+.code-wrap {
+	white-space: pre-wrap;
+	word-break: break-all;
+}
+
+.code > code {
+	background: none;
+	padding: 0;
+	font-size: 100%;
+	color: inherit;
+}
+
+blockquote {
+	font-size: 1.25em;
+	margin: 1em 0;
+	padding-left: 1em;
+	border-left: 3px solid rgb(55, 53, 47);
+}
+
+.bookmark {
+	text-decoration: none;
+	max-height: 8em;
+	padding: 0;
+	display: flex;
+	width: 100%;
+	align-items: stretch;
+}
+
+.bookmark-title {
+	font-size: 0.85em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1.75em;
+	white-space: nowrap;
+}
+
+.bookmark-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.bookmark-info {
+	flex: 4 1 180px;
+	padding: 12px 14px 14px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+.bookmark-image {
+	width: 33%;
+	flex: 1 1 180px;
+	display: block;
+	position: relative;
+	object-fit: cover;
+	border-radius: 1px;
+}
+
+.bookmark-description {
+	color: rgba(55, 53, 47, 0.6);
+	font-size: 0.75em;
+	overflow: hidden;
+	max-height: 4.5em;
+	word-break: break-word;
+}
+
+.bookmark-href {
+	font-size: 0.75em;
+	margin-top: 0.25em;
+}
+
+.sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+.code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+.serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+.mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+.pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+.pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+.pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+.pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+.pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+.pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+.pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+.pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+.pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+.pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+.pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+.pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+.highlight-default {
+	color: rgba(55, 53, 47, 1);
+}
+.highlight-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.highlight-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.highlight-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.highlight-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.highlight-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.highlight-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.highlight-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.highlight-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.highlight-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.highlight-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.highlight-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.highlight-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.highlight-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.highlight-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.highlight-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.highlight-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.highlight-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.highlight-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.block-color-default {
+	color: inherit;
+	fill: inherit;
+}
+.block-color-gray {
+	color: rgba(120, 119, 116, 1);
+	fill: rgba(120, 119, 116, 1);
+}
+.block-color-brown {
+	color: rgba(159, 107, 83, 1);
+	fill: rgba(159, 107, 83, 1);
+}
+.block-color-orange {
+	color: rgba(217, 115, 13, 1);
+	fill: rgba(217, 115, 13, 1);
+}
+.block-color-yellow {
+	color: rgba(203, 145, 47, 1);
+	fill: rgba(203, 145, 47, 1);
+}
+.block-color-teal {
+	color: rgba(68, 131, 97, 1);
+	fill: rgba(68, 131, 97, 1);
+}
+.block-color-blue {
+	color: rgba(51, 126, 169, 1);
+	fill: rgba(51, 126, 169, 1);
+}
+.block-color-purple {
+	color: rgba(144, 101, 176, 1);
+	fill: rgba(144, 101, 176, 1);
+}
+.block-color-pink {
+	color: rgba(193, 76, 138, 1);
+	fill: rgba(193, 76, 138, 1);
+}
+.block-color-red {
+	color: rgba(212, 76, 71, 1);
+	fill: rgba(212, 76, 71, 1);
+}
+.block-color-gray_background {
+	background: rgba(241, 241, 239, 1);
+}
+.block-color-brown_background {
+	background: rgba(244, 238, 238, 1);
+}
+.block-color-orange_background {
+	background: rgba(251, 236, 221, 1);
+}
+.block-color-yellow_background {
+	background: rgba(251, 243, 219, 1);
+}
+.block-color-teal_background {
+	background: rgba(237, 243, 236, 1);
+}
+.block-color-blue_background {
+	background: rgba(231, 243, 248, 1);
+}
+.block-color-purple_background {
+	background: rgba(244, 240, 247, 0.8);
+}
+.block-color-pink_background {
+	background: rgba(249, 238, 243, 0.8);
+}
+.block-color-red_background {
+	background: rgba(253, 235, 236, 1);
+}
+.select-value-color-interactiveBlue { background-color: rgba(35, 131, 226, .07); }
+.select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+.select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+.select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+.select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+.select-value-color-translucentGray { background-color: rgba(255, 255, 255, 0.0375); }
+.select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+.select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+.select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+.select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+.select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+.select-value-color-pageGlass { background-color: undefined; }
+.select-value-color-washGlass { background-color: undefined; }
+
+.checkbox {
+	display: inline-flex;
+	vertical-align: text-bottom;
+	width: 16;
+	height: 16;
+	background-size: 16px;
+	margin-left: 2px;
+	margin-right: 5px;
+}
+
+.checkbox-on {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+
+.checkbox-off {
+	background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+}
+	
+</style></head><body><article id="544a05b3-ac0c-46df-8488-d4048a653891" class="page sans"><header><div class="page-header-icon undefined"><span class="icon">📘</span></div><h1 class="page-title">Kovter - Analysis</h1><p class="page-description"></p></header><div class="page-body"><p id="5555c986-ba0e-41b5-bc84-59af05befd54" class=""><strong>Introduction</strong></p><p id="cd6bf2ff-88f4-47b0-9b7c-ec13bcd0aae4" class="">Advancements in the field of cybersecurity have pushed cybercriminals to adopt more sophisticated tactics. A recent example is the emergence of malwares that do not rely on traditional file systems but rather exploit the operating system&#x27;s registry. In this study, we examine one of these threats, known as Kovter, to understand its infection and persistence mechanisms.</p><p id="b1e2609a-5deb-407b-a020-23256556100b" class=""><strong>Context</strong></p><p id="945baa61-86c9-4320-b5c3-a77583ddedc2" class="">In a recent MalwareBytes presentation, it was revealed that modern malware families such as Poweliks, Phase Bot, and Kovter are moving away from the file system to establish persistence in the host&#x27;s registry.</p><p id="a4369d0c-5836-4546-ab57-643a85587c79" class=""><strong>Analysis Methodology</strong></p><ul id="98d76ed2-7b0d-4535-aecb-c95ee0fb1f41" class="bulleted-list"><li style="list-style-type:disc"><strong>Lab Configuration:</strong>
+For the analysis, the SANS FOR610 course&#x27;s REMWorkstation VM was used as it is pre-configured with various monitoring tools. This VM was isolated without any network connectivity.</li></ul><ul id="ee449887-9ae1-4ef3-8471-26beec932d03" class="bulleted-list"><li style="list-style-type:disc"><strong>Infection:</strong>
+The Kovter malware was executed with administrative privileges to allow for a full range of behaviors. The process was observed for about 60 seconds.</li></ul><p id="1cc5a3c5-dd69-4fe9-98f2-7d4c5868e0b5" class=""><strong>Analysis Results</strong></p><ol type="1" id="5b696454-fa7d-43cf-98c5-fc7cfa7498b9" class="numbered-list" start="1"><li><strong>Processes observed during execution:</strong><ul id="63c5ac9d-06ce-4fce-be93-4d1ab9dca4e9" class="bulleted-list"><li style="list-style-type:disc">poss_kovter.exe (x2)</li></ul><ul id="94ff2a9d-c5e0-4257-b676-19f9572a7432" class="bulleted-list"><li style="list-style-type:disc">wmiprvse.exe</li></ul><ul id="69178032-5098-4bd0-a0e3-f355f86b0437" class="bulleted-list"><li style="list-style-type:disc">mshta.exe</li></ul><ul id="d64155c7-59a8-4499-bdec-20bcf310332e" class="bulleted-list"><li style="list-style-type:disc">powershell.exe</li></ul><ul id="1372d12a-e949-4292-af17-97efb5080a93" class="bulleted-list"><li style="list-style-type:disc">regsvr32.exe (x2)</li></ul></li></ol><ol type="1" id="d69f7944-d79e-4292-906c-5281bc220d38" class="numbered-list" start="2"><li><strong>Notable observations:</strong><ul id="c79ae83b-c85f-42cf-9cca-a13d705bd7bb" class="bulleted-list"><li style="list-style-type:disc">The second instance of poss_kovter.exe invokes mshta.exe via the Windows Management Interface (WMI).</li></ul><ul id="4a5cb023-0566-4fa8-972a-1f609c9e36da" class="bulleted-list"><li style="list-style-type:disc">Many registry keys were created under the HKLM\Software key.</li></ul><ul id="876f2add-6fe3-46f2-8604-dc0981ebe53e" class="bulleted-list"><li style="list-style-type:disc">A copy of the original kovter executable was loaded into one of the regsvr32.exe processes, used to start a second instance of the same process.</li></ul><ul id="32a48f31-7787-48fb-b54c-68c97a63bfa0" class="bulleted-list"><li style="list-style-type:disc">The Microsoft script engine (mshta.exe) is invoked by WMI, which then uses Powershell to start regsvr32.exe with the injected Kovter payload.</li></ul></li></ol><ol type="1" id="2694ce0c-b07c-4d0c-ae62-92eb0c5108ec" class="numbered-list" start="3"><li><strong>Registry Analysis:</strong><ul id="1d783be1-0831-4e0f-a63a-85b0c3a1e92b" class="bulleted-list"><li style="list-style-type:disc">Kovter uses the registry for persistence, including creating keys that contain non-ASCII characters. These registry keys are therefore difficult to retrieve with standard tools like regedit.</li></ul><ul id="db079906-da25-41dc-9332-f8b28652bec9" class="bulleted-list"><li style="list-style-type:disc">These registry keys contain obfuscated JavaScript code which, when cleaned up, reveals logic to decrypt and execute another payload.</li></ul></li></ol><ol type="1" id="de076a2c-64d9-480f-97e3-fcc6e8c6f870" class="numbered-list" start="4"><li><strong>Decrypted Payload:</strong><ul id="a3cc961f-3447-4821-956a-e469569b9104" class="bulleted-list"><li style="list-style-type:disc">This is a script that decodes a payload in base64, stores it in an environment variable, and then executes PowerShell to load a script from this variable.</li></ul><ul id="16b0cbf7-412b-43df-8125-e7c4ae6c442e" class="bulleted-list"><li style="list-style-type:disc">The PowerShell script includes functions to interface with certain Windows APIs and eventually execute shellcode.</li></ul></li></ol><p id="0245cdac-9586-4b88-abc1-b251fcbe73dd" class=""><strong>Conclusion</strong></p><p id="2675f2f5-a8bf-4f69-ab45-527ce596428a" class="">Kovter is an example of the increasing sophistication of malwares. By avoiding the file system and using advanced obfuscation tactics in the registry, it proves resistant to traditional detections. This analysis underscores the importance of having advanced monitoring and analysis capabilities to detect and neutralize such threats. Additionally, it reinforces the need for ongoing education and regular updating of cybersecurity knowledge to deal with the constantly evolving cyber threat.</p><hr id="931c3127-5748-4527-b0bc-96109ffe54ea"/><h3 id="81651b71-281e-483c-9994-c7f4335b58c8" class=""><strong>1. Memory Monitoring Module:</strong></h3><p id="c1159bc3-9290-4258-a9db-1f1df26def0a" class=""><strong>Primary Function</strong>: This module offers a comprehensive view of the system&#x27;s RAM, crucial for spotting fileless malware which often operates within memory.</p><p id="8a5f9c11-44f7-4ad2-8a6c-2d9376c3c034" class=""><strong>Operational Details</strong>:</p><ul id="2ff0bbb4-a890-4fda-8654-0e22c8fda9ba" class="bulleted-list"><li style="list-style-type:disc"><strong>Periodic Snapshots</strong>: At regular intervals, the module takes a &#x27;photograph&#x27; of what&#x27;s currently in the memory. These periodic checks are vital as fileless malware might not always be active, and capturing multiple snapshots increases the chance of detection.</li></ul><ul id="241088c3-aa19-4c19-a82f-ac47749e09db" class="bulleted-list"><li style="list-style-type:disc"><strong>Signature Comparison</strong>: Once a snapshot is taken, it is instantly compared against a database of known fileless malware signatures. Any resemblance or match triggers an immediate response.</li></ul><ul id="bdb3072e-2473-4411-a1c6-457d37dc0f8f" class="bulleted-list"><li style="list-style-type:disc"><strong>Anomaly Detection</strong>: Beyond known signatures, the module also checks for any unusual or unexpected patterns in the memory. These could be indicative of newer, unknown fileless malwares.</li></ul><h3 id="079096a1-cb71-4f3c-91c6-501181255302" class=""><strong>2. Process Monitoring Module:</strong></h3><p id="b6335912-e79c-4472-bae6-eccda95c4251" class=""><strong>Primary Function</strong>: Every operation on a computer corresponds to a running process. By keeping a close watch on these, we can spot any which shouldn’t be there.</p><p id="0af8028a-5d05-496e-a21a-0520acc8ccd2" class=""><strong>Operational Details</strong>:</p><ul id="49dc5f70-37f4-4917-816e-f221af7f2164" class="bulleted-list"><li style="list-style-type:disc"><strong>Process Enumeration</strong>: To begin, the module lists all running processes on the system. This serves as a bird&#x27;s-eye view of system activity at any given moment.</li></ul><ul id="b4102020-6c05-4922-af17-f3ccfb11e305" class="bulleted-list"><li style="list-style-type:disc"><strong>Behaviour Analysis</strong>: Each listed process undergoes a thorough scrutiny. Key factors include the origin of the process, its interactions with other processes, and any high-privilege requests. Unusual behaviours, especially from unknown or rarely-seen processes, are red-flagged.</li></ul><h3 id="e9c52e15-0163-43f1-9373-611cfa25e17e" class=""><strong>3. Registry Monitoring Module:</strong></h3><p id="69ad8efa-2d43-409a-98c8-22cfea1c91ec" class=""><strong>Primary Function</strong>: The Windows Registry is a treasure trove of system configuration data. Malware, including fileless types, often tamper with the registry to ensure they remain active after system restarts. This module monitors such changes.</p><p id="28236886-cef3-48d4-aff0-23ca4f9b91e9" class=""><strong>Operational Details</strong>:</p><ul id="175b6e83-dceb-45ec-8ca4-5e6beac042c5" class="bulleted-list"><li style="list-style-type:disc"><strong>Key &amp; Value Watch</strong>: While the entire registry is vast, there are known areas or &#x27;keys&#x27; that are typically targeted by malware. The module prioritises these but remains vigilant across the board.</li></ul><ul id="e608438d-a0c4-4017-8c9f-e09ef262dfe8" class="bulleted-list"><li style="list-style-type:disc"><strong>Modification Log</strong>: Any changes, be it a new key/value or a modification to an existing one, are logged. Special attention is paid to uncommon or unexpected changes.</li></ul><h3 id="7acb7f4d-7dcf-4180-b4bc-709edd0176cf" class=""><strong>4. Heuristic Analysis Module:</strong></h3><p id="a9d0a86e-c3c7-487f-b8c3-415b1c9fa28f" class=""><strong>Primary Function</strong>: Not all malware can be caught by looking for known patterns or signatures. Some are new or have evolved. Heuristic analysis is our answer to such threats, focusing on behaviour rather than appearance.</p><p id="0fb162a7-d396-420c-90f9-23a78b2e9914" class=""><strong>Operational Details</strong>:</p><ul id="99f74873-9ef0-433f-aa99-d268ed975445" class="bulleted-list"><li style="list-style-type:disc"><strong>System Behaviour Study</strong>: The module constantly observes system behaviour, noting down anything that deviates from the norm. This could be high resource usage, unexpected data transfers, or unusual system requests.</li></ul><ul id="243fef22-225b-410a-9c1d-938e8e671d9f" class="bulleted-list"><li style="list-style-type:disc"><strong>TTP Matching</strong>: Tactics, Techniques, and Procedures (TTPs) are common strategies employed by malware. By understanding and recognising these, the module can detect even previously unknown threats.</li></ul><ul id="36ad1380-24d4-4178-9a98-07fc8d70e628" class="bulleted-list"><li style="list-style-type:disc"><strong>Data Correlation</strong>: One of the standout features of this module is its ability to draw data from the other three modules, ensuring a holistic analysis. Correlating data from multiple sources reduces false positives and provides a more nuanced view of potential threats.</li></ul><h3 id="1504eae6-6d16-48bb-8ef8-65ed15bb1a64" class=""><strong>Conclusion &amp; Workflow</strong><strong>:</strong></h3><p id="85e918b3-1364-4d34-8145-f0bf4e05785c" class="">Upon initiation, the programme launches all modules concurrently, ensuring 360-degree surveillance. As data flows in from the Memory, Process, and Registry modules, the Heuristic Analysis module plays the role of the central hub, collating, and interpreting the information.</p><p id="f2280f98-a130-4307-a84a-32ae204f0ba9" class="">Any hint of fileless malware activity, be it from a known signature or unusual behaviour, is promptly addressed, with alerts sent out to ensure swift action.</p><p id="dc5d00be-8310-460b-aaa9-71b131a77252" class="">This layered approach, combining signature-based detection with behavioural analytics, provides a robust defence against the evolving threat of fileless malware.</p><p id="d3bbd24e-2870-4ab5-98b3-2768600f3e59" class="">
+</p><figure id="4d575a81-8629-4c41-8a59-ac533e8985ad"><a href="https://www.cyber.airbus.com/fileless-malware-behavioural-analysis-kovter-persistence/" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Fileless Malware – A Behavioural Analysis Of Kovter Persistence - Airbus Defence and Space Cyber</div><div class="bookmark-description">During a recent talk by a representative of MalwareBytes, it was discussed that several modern malware families, notable Poweliks, Phase Bot and Kovter are</div></div><div class="bookmark-href"><img src="https://www.cyber.airbus.com/app/uploads/2022/05/index.ico" class="icon bookmark-icon"/>https://www.cyber.airbus.com/fileless-malware-behavioural-analysis-kovter-persistence/</div></div><img src="https://www.cyber.airbus.com/app/uploads/2016/03/kovter1_thumb.png" class="bookmark-image"/></a></figure><figure id="c09601a0-c85f-4a1b-ac11-43b1ccd6aea5"><a href="https://www.malwarebytes.com/blog/news/2016/07/untangling-kovter" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Untangling Kovter&#x27;s persistence methods | Malwarebytes Labs</div><div class="bookmark-description">Kovter is a click-fraud malware famous from the unconventional tricks used for persistence. It hides malicious modules in PowerShell scripts as well as in registry keys to make detection and analysis difficult. In this post, we will take a deep dive into the techniques used by it&#x27;s latest samples to see all the elements and how they cooperate together.</div></div><div class="bookmark-href"><img src="https://www.malwarebytes.com/images/favicon-196x196.png" class="icon bookmark-icon"/>https://www.malwarebytes.com/blog/news/2016/07/untangling-kovter</div></div><img src="https://www.malwarebytes.com/blog/images/uploads/2016/04/pexels-web-feature.jpg" class="bookmark-image"/></a></figure><figure id="6c8b04ed-4c01-476f-9e77-21bedf64c4b7"><a href="https://www.trendmicro.com/vinfo/us/security/news/cybercrime-and-digital-threats/kovter-an-evolving-malware-gone-fileless" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">KOVTER: An Evolving Malware Gone Fileless</div><div class="bookmark-description">KOVTER is one example of a constantly evolving malware. Initially starting out as a police ransomware, it eventually evolved into a much more effective and evasive fileless malware. Here is a closer look at KOVTER, and how organizations can lessen its impact.</div></div><div class="bookmark-href"><img src="https://www.trendmicro.com/favicon.ico" class="icon bookmark-icon"/>https://www.trendmicro.com/vinfo/us/security/news/cybercrime-and-digital-threats/kovter-an-evolving-malware-gone-fileless</div></div><img src="https://documents.trendmicro.com/images/TEx/articles/vulnerability-windows.jpg" class="bookmark-image"/></a></figure></div></article></body></html>
